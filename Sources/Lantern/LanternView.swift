@@ -216,7 +216,11 @@ open class LanternView: UIView, UIScrollViewDelegate {
         }
         var removeFromVisibles = [Int]()
         for (index, cell) in visibleCells {
-            if index == pageIndex {
+            //修复重复移除添加问题
+            if index == pageIndex || index == pageIndex - 1 || index == pageIndex + 1  {
+                if index != pageIndex {
+                    cellWillDisappear(cell, index)
+                }
                 continue
             }
             cellWillDisappear(cell, index)
@@ -232,7 +236,8 @@ open class LanternView: UIView, UIScrollViewDelegate {
             if index < 0 || index > itemsTotalCount - 1 {
                 continue
             }
-            if index == pageIndex && visibleCells[index] != nil {
+            //修复重复移除添加问题
+            if visibleCells[index] != nil {
                 continue
             }
             let clazz = cellClassAtIndex(index)
@@ -241,6 +246,9 @@ open class LanternView: UIView, UIScrollViewDelegate {
             let cell = dequeue(cellType: clazz, browser: browser)
             visibleCells[index] = cell
             scrollView.addSubview(cell)
+            //修复重复移除添加问题
+            reloadCellAtIndex((cell, index, pageIndex))
+            cell.setNeedsLayout()
         }
     }
     
@@ -259,11 +267,12 @@ open class LanternView: UIView, UIScrollViewDelegate {
     
     /// 刷新所有Cell的数据
     open func reloadItems() {
-        visibleCells.forEach { [weak self] index, cell in
-            guard let `self` = self else { return }
-            self.reloadCellAtIndex((cell, index, self.pageIndex))
-            cell.setNeedsLayout()
-        }
+        //修复重复移除添加问题并重复reload的问题
+//        visibleCells.forEach { [weak self] index, cell in
+//            guard let `self` = self else { return }
+//            self.reloadCellAtIndex((cell, index, self.pageIndex))
+//            cell.setNeedsLayout()
+//        }
         if let cell = visibleCells[pageIndex] {
             cellWillAppear(cell, pageIndex)
         }
