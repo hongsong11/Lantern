@@ -99,6 +99,10 @@ open class LanternView: UIView, UIScrollViewDelegate {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
+        
+        let height = scrollView.frame.size.height
+        let width = scrollView.frame.size.width
+        
         if scrollDirection == .horizontal {
             scrollView.frame = CGRect(x: 0, y: 0, width: bounds.width + itemSpacing, height: bounds.height)
         } else {
