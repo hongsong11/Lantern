@@ -104,7 +104,11 @@ open class LanternView: UIView, UIScrollViewDelegate {
         } else {
             scrollView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height + itemSpacing)
         }
-        reloadData()
+        
+        //避免重复刷新数据
+        if height != scrollView.frame.size.height || width != scrollView.frame.size.width {
+            reloadData()
+        }
     }
     
     open func resetContentSize() {
