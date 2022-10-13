@@ -107,6 +107,11 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         return view
     }()
     
+    ///挂件
+    open var pendant: UIView?
+    
+    open var pendantSize: CGSize = CGSize(width: 98, height: 144)
+    
     open weak var previousNavigationControllerDelegate: UINavigationControllerDelegate?
     
     deinit {
@@ -171,6 +176,9 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         maskView.frame = view.bounds
         browserView.frame = view.bounds
         pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: pageIndex)
+        let x = view.bounds.size.width - pendantSize.width - 12
+        let y = view.bounds.size.height - pendantSize.height - 161
+        pendant?.frame = CGRect(x: x, y: y, width: pendantSize.width, height: pendantSize.height)
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -185,6 +193,10 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
             view.addSubview(indicator)
             indicator.setup(with: self)
         }
+        
+        if let tPendant = pendant {
+            view.addSubview(tPendant)
+        }
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
@@ -195,6 +207,11 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         browserView.isRotating = true
+    }
+    
+    open func closePendant() {
+        pendant?.removeFromSuperview()
+        pendant = nil
     }
     
     //
@@ -275,6 +292,7 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
     open func dismiss() {
         setStatusBar(hidden: false)
         pageIndicator?.removeFromSuperview()
+        pendant?.removeFromSuperview()
         if presentingViewController != nil {
             self.presentingViewController?.dismiss(animated: true, completion: nil)
         } else {
