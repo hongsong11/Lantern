@@ -112,6 +112,79 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
     
     open var pendantSize: CGSize = CGSize(width: 98, height: 144)
     
+    open lazy var closeButton : UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "close", in: resourceBundle, compatibleWith: nil), for: .normal)
+        button.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 0.4)
+        button.addTarget(self, action: #selector(clickCloseBtn(_:)), for: .touchUpInside)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 16
+        button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        return button
+    }()
+    
+    open lazy var downloadButton : UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "download", in: resourceBundle, compatibleWith: nil), for: .normal)
+        button.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 0.4)
+        button.addTarget(self, action: #selector(clickDownloadBtn(_:)), for: .touchUpInside)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 16
+        button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        return button
+    }()
+    
+    open lazy var moreButton : UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "more", in: resourceBundle, compatibleWith: nil), for: .normal)
+        button.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 0.4)
+        button.addTarget(self, action: #selector(clickMoreBtn(_:)), for: .touchUpInside)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 16
+        button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        return button
+    }()
+    
+    public typealias DownloadAction = (Lantern, Int) -> Void
+    open var downloadAction: DownloadAction?
+    
+    public typealias ShareAction = (Lantern, Int) -> Void
+    open var shareAction: ShareAction?
+    
+    lazy var resourceBundle: Bundle? = {
+        let bundle = Bundle(for: Lantern.self);
+        guard let url = bundle.url(forResource: "Lantern", withExtension: "bundle") else {
+            return nil
+        }
+        return Bundle(url: url)
+    }()
+    
+    var safeAreaInset: UIEdgeInsets {
+        var insets = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+        if #available(iOS 11.0, *) {
+            insets = UIApplication.shared.keyWindow?.safeAreaInsets ?? insets
+        }
+        return insets
+    }
+    
+    open var hiddenClose: Bool  = false
+    
+    open var hiddenDownload: Bool  = false
+    
+    open var hiddenShare: Bool  = false
+    
+    open var hiddenBottomButton: Bool = false {
+        willSet {
+            self.closeButton.isHidden = newValue || hiddenClose
+            self.downloadButton.isHidden = newValue || hiddenDownload
+            self.moreButton.isHidden = newValue || hiddenShare
+        }
+    }
+    
+    open lazy var btnBottomPadding: CGFloat = {
+        return 30
+    }()
+    
     open weak var previousNavigationControllerDelegate: UINavigationControllerDelegate?
     
     deinit {
@@ -160,6 +233,9 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         view.backgroundColor = .clear
         view.addSubview(maskView)
         view.addSubview(browserView)
+        view.addSubview(closeButton)
+        view.addSubview(downloadButton)
+        view.addSubview(moreButton)
         
         browserView.didChangedPageIndex = { [weak self] index in
             guard let `self` = self else { return }
@@ -176,9 +252,13 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         maskView.frame = view.bounds
         browserView.frame = view.bounds
         pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: pageIndex)
-        let x = view.bounds.size.width - pendantSize.width - 12
-        let y = view.bounds.size.height - pendantSize.height - 161
+        let x = view.bounds.size.width - pendantSize.width - 12 - safeAreaInset.right
+        let y = view.bounds.size.height - pendantSize.height - 161 - safeAreaInset.bottom
         pendant?.frame = CGRect(x: x, y: y, width: pendantSize.width, height: pendantSize.height)
+        let btnY = view.bounds.size.height - 32 - btnBottomPadding - safeAreaInset.bottom
+        closeButton.frame = CGRect(x: 20 + safeAreaInset.left, y: btnY, width: 32, height: 32)
+        downloadButton.frame = CGRect(x: view.bounds.size.width - 32 - 64 - safeAreaInset.right, y: btnY, width: 32, height: 32)
+        moreButton.frame = CGRect(x: view.bounds.size.width - 32 - 20 - safeAreaInset.right, y: btnY, width: 32, height: 32)
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -342,5 +422,18 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         }
         
         return viewController
+    }
+    
+    // MARK: - Action
+    @objc func clickCloseBtn(_ button: UIButton) {
+        self.dismiss()
+    }
+
+    @objc func clickDownloadBtn(_ button: UIButton) {
+        downloadAction?(self, self.pageIndex)
+    }
+
+    @objc func clickMoreBtn(_ button: UIButton) {
+        shareAction?(self, self.pageIndex)
     }
 }
