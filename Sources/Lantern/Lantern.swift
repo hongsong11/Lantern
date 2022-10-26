@@ -167,11 +167,23 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         return insets
     }
     
-    open var hiddenClose: Bool  = false
+    open var hiddenClose: Bool  = false {
+        willSet {
+            self.closeButton.isHidden = newValue || hiddenBottomButton
+        }
+    }
     
-    open var hiddenDownload: Bool  = false
+    open var hiddenDownload: Bool  = false {
+        willSet {
+            self.downloadButton.isHidden = newValue || hiddenBottomButton
+        }
+    }
     
-    open var hiddenShare: Bool  = false
+    open var hiddenShare: Bool = false {
+        willSet {
+            self.moreButton.isHidden = newValue || hiddenBottomButton
+        }
+    }
     
     open var hiddenBottomButton: Bool = false {
         willSet {
