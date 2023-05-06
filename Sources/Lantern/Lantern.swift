@@ -114,34 +114,67 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
     
     open lazy var closeButton : UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "close", in: resourceBundle, compatibleWith: nil), for: .normal)
         button.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 0.4)
         button.addTarget(self, action: #selector(clickCloseBtn(_:)), for: .touchUpInside)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
         button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        
+        let blurEffect = UIBlurEffect(style: .dark)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = button.bounds
+        blurView.isUserInteractionEnabled = false
+        button.addSubview(blurView)
+        
+        let imageView = UIImageView(image: UIImage(named: "close", in: resourceBundle, compatibleWith: nil))
+        imageView.isUserInteractionEnabled = false
+        imageView.frame = CGRect(x: 6, y: 6, width: 20, height: 20)
+        button.addSubview(imageView)
+        
         return button
     }()
     
     open lazy var downloadButton : UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "download", in: resourceBundle, compatibleWith: nil), for: .normal)
         button.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 0.4)
         button.addTarget(self, action: #selector(clickDownloadBtn(_:)), for: .touchUpInside)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
         button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        
+        let blurEffect = UIBlurEffect(style: .dark)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = button.bounds
+        blurView.isUserInteractionEnabled = false
+        button.addSubview(blurView)
+        
+        let imageView = UIImageView(image: UIImage(named: "download", in: resourceBundle, compatibleWith: nil))
+        imageView.isUserInteractionEnabled = false
+        imageView.frame = CGRect(x: 6, y: 6, width: 20, height: 20)
+        button.addSubview(imageView)
+        
         return button
     }()
     
     open lazy var moreButton : UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "more", in: resourceBundle, compatibleWith: nil), for: .normal)
         button.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 0.4)
         button.addTarget(self, action: #selector(clickMoreBtn(_:)), for: .touchUpInside)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
         button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        
+        let blurEffect = UIBlurEffect(style: .dark)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = button.bounds
+        blurView.isUserInteractionEnabled = false
+        button.addSubview(blurView)
+        
+        let imageView = UIImageView(image: UIImage(named: "more", in: resourceBundle, compatibleWith: nil))
+        imageView.isUserInteractionEnabled = false
+        imageView.frame = CGRect(x: 6, y: 6, width: 20, height: 20)
+        button.addSubview(imageView)
+        
         return button
     }()
     
@@ -179,7 +212,7 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         }
     }
     
-    open var hiddenShare: Bool = false {
+    open var hiddenMore: Bool = false {
         willSet {
             self.moreButton.isHidden = newValue || hiddenBottomButton
         }
@@ -189,7 +222,7 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         willSet {
             self.closeButton.isHidden = newValue || hiddenClose
             self.downloadButton.isHidden = newValue || hiddenDownload
-            self.moreButton.isHidden = newValue || hiddenShare
+            self.moreButton.isHidden = newValue || hiddenMore
         }
     }
     
@@ -269,7 +302,13 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
         pendant?.frame = CGRect(x: x, y: y, width: pendantSize.width, height: pendantSize.height)
         let btnY = view.bounds.size.height - 32 - btnBottomPadding - safeAreaInset.bottom
         closeButton.frame = CGRect(x: 20 + safeAreaInset.left, y: btnY, width: 32, height: 32)
-        downloadButton.frame = CGRect(x: view.bounds.size.width - 32 - 64 - safeAreaInset.right, y: btnY, width: 32, height: 32)
+        
+        if hiddenMore {
+            downloadButton.frame = CGRect(x: view.bounds.size.width - 32 - 20 - safeAreaInset.right, y: btnY, width: 32, height: 32)
+        } else {
+            downloadButton.frame = CGRect(x: view.bounds.size.width - 32 - 64 - safeAreaInset.right, y: btnY, width: 32, height: 32)
+        }
+                
         moreButton.frame = CGRect(x: view.bounds.size.width - 32 - 20 - safeAreaInset.right, y: btnY, width: 32, height: 32)
     }
     
