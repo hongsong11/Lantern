@@ -232,6 +232,10 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
     
     open weak var previousNavigationControllerDelegate: UINavigationControllerDelegate?
     
+    open lazy var supportedOrientations: UIInterfaceOrientationMask = {
+        return [.portrait, .landscapeLeft, .landscapeRight]
+    }()
+    
     deinit {
         LanternLog.high("deinit - \(self.classForCoder)")
         navigationController?.delegate = previousNavigationControllerDelegate
@@ -486,5 +490,9 @@ open class Lantern: UIViewController, UIViewControllerTransitioningDelegate, UIN
 
     @objc func clickMoreBtn(_ button: UIButton) {
         shareAction?(self, self.pageIndex)
+    }
+    
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return supportedOrientations
     }
 }
